@@ -60,7 +60,7 @@ export default function Progress() {
 
   return (
     <>
-      <PageHeading eyebrow="PROGRES / CATATAN" title="Lihat yang sudah bergerak." description="Ringkasan ini mengikuti data yang Anda simpan di DayFlow." />
+      <PageHeading eyebrow="PROGRES / CATATAN" title="Lihat yang sudah bergerak." description="Ringkasan ini mengikuti data yang Anda simpan di ORBIT." />
       <div className="period-switch" role="group" aria-label="Periode progres">{[[7, '7 hari'], [30, '30 hari'], [90, '90 hari']].map(([value, label]) => <button type="button" key={value} aria-pressed={period === value} className={period === value ? 'active' : ''} onClick={() => setPeriod(value)}>{label}</button>)}</div>
       <section className="progress-metrics">{cards.map(({ label, value, note, icon: Icon }) => <article className="progress-metric" key={label}><span className="metric-icon"><Icon size={18} /></span><span className="metric-label">{label}</span><strong className="metric-value">{value}</strong><span className="metric-note">{note}</span></article>)}</section>
       <section className="panel progress-chart-panel">

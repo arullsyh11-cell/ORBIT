@@ -20,7 +20,7 @@ const pages = {
   notes: { title: 'Catatan', eyebrow: 'RUANG PIKIRAN' },
   goals: { title: 'Target mingguan', eyebrow: 'ARAH MINGGU INI' },
   progress: { title: 'Progres', eyebrow: 'CATATAN PERKEMBANGAN' },
-  settings: { title: 'Pengaturan', eyebrow: 'SESUAIKAN DAYFLOW' },
+  settings: { title: 'Pengaturan', eyebrow: 'SESUAIKAN ORBIT' },
 }
 const Progress = lazy(() => import('./pages/Progress.jsx'))
 
@@ -45,7 +45,7 @@ export default function App() {
         if (reminderAt <= now && now - reminderAt < 60_000) {
           notifiedRef.current.add(`${record.id}:${record.reminder}`)
           try {
-            new Notification(`Pengingat ${record.kind} DayFlow`, { body: record.title })
+            new Notification(`Pengingat ${record.kind} ORBIT`, { body: record.title })
           } catch {
             notify('Browser tidak dapat menampilkan pengingat ini.', 'error')
           }
@@ -57,7 +57,7 @@ export default function App() {
     return () => window.clearInterval(timer)
   }, [settings.remindersEnabled, tasks, schedules, notify])
 
-  if (!ready) return <main className="loading-screen flex min-h-screen items-center justify-center gap-3" aria-live="polite"><span className="dayline" aria-hidden="true" />Memuat ruang DayFlow…</main>
+  if (!ready) return <main className="loading-screen" aria-live="polite"><div className="loading-brand" role="status"><img className="loading-brand-logo" src="/assets/orbit-logo.png" width="56" height="56" alt="" /><span className="brand-name"><span className="brand-accent">O</span>RBIT</span><span className="loading-message">Menyiapkan ruang kerja…</span><span className="loading-indicator" aria-hidden="true" /></div></main>
   const page = pages[active] ?? pages.dashboard
   const Page = {
     dashboard: Dashboard, tasks: Tasks, calendar: Calendar, routines: Routines,
@@ -81,7 +81,7 @@ export default function App() {
         </header>
         {storageError && <div className="storage-alert" role="alert">{storageError}<button type="button" onClick={() => setActive('settings')}>Buka pengaturan</button></div>}
             <div className="page-container"><div key={active} className="page-transition"><Suspense fallback={<div className="loading-panel" role="status" aria-live="polite"><span className="dayline" aria-hidden="true" />Memuat ringkasan progres…</div>}><Page onNavigate={setActive} /></Suspense></div></div>
-        <footer className="app-footer"><span>DayFlow</span><span>Organize Your Day. Own Your Flow.</span></footer>
+        <footer className="app-footer"><span>ORBIT</span><span>Your Life, In Your Orbit.</span></footer>
       </main>
       {toast && <div key={toast.id} className={`toast toast-${toast.tone}`} role="status" aria-live="polite">{toast.message}</div>}
     </div>

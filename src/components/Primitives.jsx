@@ -1,3 +1,4 @@
+import { cloneElement, isValidElement, useId } from 'react'
 import { Check, Plus } from 'lucide-react'
 
 export function Button({ children, variant = 'primary', className = '', ...props }) {
@@ -18,7 +19,15 @@ export function PageHeading({ eyebrow, title, description, action }) {
 }
 
 export function Field({ label, children, hint, className = '' }) {
-  return <div className={`field ${className}`}><span className="field-label">{label}</span>{children}{hint && <span className="field-hint">{hint}</span>}</div>
+  const id = useId()
+  const labelId = `field-label-${id}`
+  const control = isValidElement(children)
+    ? cloneElement(children, {
+      id: children.props.id ?? `field-control-${id}`,
+      'aria-labelledby': children.props['aria-labelledby'] ?? labelId,
+    })
+    : children
+  return <div className={`field ${className}`}><span className="field-label" id={labelId}>{label}</span>{control}{hint && <span className="field-hint">{hint}</span>}</div>
 }
 
 export function EmptyState({ icon: Icon, title, detail, action, compact = false }) {

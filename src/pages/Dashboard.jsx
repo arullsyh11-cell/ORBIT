@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
-import { ArrowUpRight, CalendarClock, Check, CheckSquare2, CircleDot, FilePlus2, Flag, ListTodo, NotebookPen, Pencil, Plus } from 'lucide-react'
-import { AddButton, Button, EmptyState, PageHeading, ProgressBar } from '../components/Primitives.jsx'
+import { ArrowUpRight, CalendarDays, CalendarClock, CheckSquare2, CircleDot, FilePlus2, Flag, ListTodo, NotebookPen, Plus } from 'lucide-react'
+import { Button, EmptyState, ProgressBar } from '../components/Primitives.jsx'
 import Select from '../components/Select.jsx'
+import { AnimatedContainer, ProgressCard, QuickActionButton, RoutineItem, ScheduleCard, StatisticCard } from '../components/DashboardWidgets.jsx'
 import { RoutineForm, ScheduleForm, TaskForm } from '../components/Forms.jsx'
 import Modal, { ModalCancelButton } from '../components/Modal.jsx'
 import { useWorkspace } from '../context/WorkspaceContext.jsx'
@@ -83,71 +84,65 @@ export default function Dashboard({ onNavigate }) {
   const metrics = useMemo(() => [
     { label: 'Tugas hari ini', value: totalToday, note: `${completedToday} selesai`, icon: ListTodo, action: 'tasks' },
     { label: 'Belum selesai', value: todayTasks.length, note: `${overdue.length} terlambat`, icon: CheckSquare2, action: 'tasks' },
-    { label: 'Rutinitas hari ini', value: `${doneRoutines}/${todayRoutines.length}`, note: 'sudah dijalani', icon: CircleDot, action: 'routines' },
+    { label: 'Rutinitas hari ini', value: `${doneRoutines}/${todayRoutines.length}`, note: `${doneRoutines} dari ${todayRoutines.length} selesai`, icon: CircleDot, action: 'routines' },
+    { label: 'Perlu perhatian', value: overdue.length, note: overdue.length ? 'tugas melewati tenggat' : 'semua tenggat terkendali', icon: CalendarClock, action: 'tasks', accent: true },
   ], [totalToday, completedToday, todayTasks.length, overdue.length, doneRoutines, todayRoutines.length])
 
   return (
     <>
-      <PageHeading eyebrow="DAYFLOW / HARI INI" title={`${getGreeting()}${data.profile.name ? `, ${data.profile.name}` : ''}.`} description="Pilih satu hal untuk memulai. Sisanya bisa menyusul." />
-
-      <section className="dashboard-intro">
-        <div className="intro-date"><span className="dayline" aria-hidden="true" /><span>{formatDate(today, { weekday: 'long', day: 'numeric', month: 'long' })}</span></div>
-        <div className="intro-progress"><span className="intro-progress-label">Penyelesaian hari ini</span><strong>{completion}%</strong><ProgressBar value={completion} label="Persentase tugas hari ini selesai" showValue={false} /></div>
-      </section>
+      <AnimatedContainer as="section" className="dashboard-hero" index={0} aria-label="Ringkasan hari ini">
+        <div className="dashboard-hero-copy">
+          <p className="eyebrow">ORBIT / HARI INI</p>
+          <h1>{getGreeting()}{data.profile.name ? `, ${data.profile.name}` : ''}.</h1>
+          <p className="dashboard-hero-description">Hari ini, mulailah dari satu langkah kecil.</p>
+          <div className="dashboard-date"><CalendarDays size={16} aria-hidden="true" /><time dateTime={today}>{formatDate(today, { weekday: 'long', day: 'numeric', month: 'long' })}</time></div>
+        </div>
+        <ProgressCard completion={completion} completed={completedToday} total={totalToday} remaining={todayTasks.length} />
+      </AnimatedContainer>
 
       {widget('summary') && <section className="metric-grid" aria-label="Ringkasan hari ini">
-        {metrics.map(({ label, value, note, icon: Icon, action }) => <button type="button" key={label} className="metric-card" onClick={() => onNavigate(action)}>
-          <span className="metric-icon"><Icon size={18} aria-hidden="true" /></span><span className="metric-label">{label}</span><strong className="metric-value">{value}</strong><span className="metric-note">{note}</span><ArrowUpRight size={16} className="metric-arrow" aria-hidden="true" />
-        </button>)}
-        <button type="button" className={`metric-card metric-card-accent${overdue.length ? ' has-overdue' : ''}`} onClick={() => onNavigate('tasks')}>
-          <span className="metric-icon"><CalendarClock size={18} aria-hidden="true" /></span><span className="metric-label">Perlu perhatian</span><strong className="metric-value">{overdue.length}</strong><span className="metric-note">tugas melewati tenggat</span><ArrowUpRight size={16} className="metric-arrow" aria-hidden="true" />
-        </button>
+        {metrics.map(({ label, value, note, icon, action, accent }, index) => <StatisticCard key={label} label={label} value={value} note={note} icon={icon} accent={accent} index={index + 1} onClick={() => onNavigate(action)} />)}
       </section>}
 
-      <section className="quick-actions" aria-label="Aksi cepat">
-        <span className="quick-actions-label">Mulai sesuatu</span>
+      <AnimatedContainer as="section" className="quick-actions" index={2} aria-label="Aksi cepat">
+        <div className="quick-actions-heading"><p className="eyebrow">MULAI DARI SINI</p><span>Pilih langkah berikutnya</span></div>
         <div className="quick-action-list">
-          <Button onClick={() => { setEditRecord(null); setModal('task') }}><Plus size={17} />Tambah tugas</Button>
-          <Button variant="secondary" onClick={() => { setEditRecord(null); setModal('schedule') }}><CalendarClock size={17} />Jadwalkan</Button>
-          <Button variant="secondary" onClick={quickNote}><FilePlus2 size={17} />Catatan</Button>
-          <Button variant="secondary" onClick={() => { setEditRecord(null); setModal('routine') }}><CircleDot size={17} />Rutinitas</Button>
+          <QuickActionButton icon={Plus} variant="primary" onClick={() => { setEditRecord(null); setModal('task') }}>Tambah tugas</QuickActionButton>
+          <QuickActionButton icon={CalendarClock} onClick={() => { setEditRecord(null); setModal('schedule') }}>Jadwalkan</QuickActionButton>
+          <QuickActionButton icon={FilePlus2} onClick={quickNote}>Catatan</QuickActionButton>
+          <QuickActionButton icon={CircleDot} onClick={() => { setEditRecord(null); setModal('routine') }}>Rutinitas</QuickActionButton>
         </div>
-      </section>
+      </AnimatedContainer>
 
       <div className="dashboard-columns">
-        {widget('schedule') && <section className="panel panel-schedule">
+        {widget('schedule') && <AnimatedContainer as="section" className="panel panel-schedule" index={3}>
           <div className="panel-heading"><div><p className="eyebrow">WAKTU BERIKUTNYA</p><h2>Jadwal mendatang</h2></div><button type="button" className="text-link" onClick={() => onNavigate('calendar')}>Buka kalender <ArrowUpRight size={15} /></button></div>
-          {upcomingSchedules.length ? <div className="schedule-list">{upcomingSchedules.map(item => <div className="schedule-row" key={item.id}>
-            <div className="schedule-time"><strong>{item.startTime}</strong><span>{formatDate(item.date, { day: 'numeric', month: 'short' })}</span></div>
-            <span className="schedule-rule" aria-hidden="true" />
-            <div className="schedule-copy"><strong>{item.title}</strong><span>{item.category} · sampai {item.endTime}</span></div>
-            <button className="icon-button subtle-icon" type="button" aria-label={`Ubah jadwal ${item.title}`} onClick={() => { setEditRecord(item); setModal('schedule') }}><Pencil size={15} /></button>
-          </div>)}</div> : <EmptyState icon={CalendarClock} title="Belum ada jadwal" detail="Tambahkan kegiatan agar waktunya terlihat di sini." compact action={<Button variant="secondary" onClick={() => setModal('schedule')}>Tambah jadwal</Button>} />}
-        </section>}
+          {upcomingSchedules.length ? <div className="schedule-list">{upcomingSchedules.map(item => <ScheduleCard key={item.id} item={item} today={today} onEdit={() => { setEditRecord(item); setModal('schedule') }} />)}</div> : <EmptyState icon={CalendarClock} title="Belum ada jadwal" detail="Tambahkan kegiatan agar waktunya terlihat di sini." compact action={<Button variant="secondary" onClick={() => setModal('schedule')}>Tambah jadwal</Button>} />}
+        </AnimatedContainer>}
 
-        {widget('routines') && <section className="panel panel-routines">
+        {widget('routines') && <AnimatedContainer as="section" className="panel panel-routines" index={4}>
           <div className="panel-heading"><div><p className="eyebrow">LANGKAH KECIL</p><h2>Rutinitas hari ini</h2></div><button type="button" className="text-link" onClick={() => onNavigate('routines')}>Lihat semua <ArrowUpRight size={15} /></button></div>
           {todayRoutines.length ? <>
             <div className="routine-summary"><div><strong>{doneRoutines}</strong><span> dari {todayRoutines.length} selesai</span></div><ProgressBar value={Math.round(doneRoutines / todayRoutines.length * 100)} label="Rutinitas selesai hari ini" /></div>
             <ul className="routine-checklist">{todayRoutines.slice(0, 4).map(routine => {
               const complete = (routine.completedDates ?? []).includes(today)
-              return <li key={routine.id}><button type="button" className="check-control" aria-label={`${complete ? 'Batalkan' : 'Tandai'} ${routine.title}`} aria-pressed={complete} onClick={() => toggleRoutine(routine)}><span className={`checkbox-visual${complete ? ' checked' : ''}`}>{complete && <Check size={13} />}</span><span className={complete ? 'routine-done' : ''}>{routine.title}</span></button>{routine.time && <time>{routine.time}</time>}</li>
+              return <RoutineItem key={routine.id} routine={routine} complete={complete} onToggle={() => toggleRoutine(routine)} />
             })}</ul>
           </> : <EmptyState icon={CircleDot} title="Ruang ini masih kosong" detail="Buat rutinitas yang ingin Anda jaga hari ini." compact action={<Button variant="secondary" onClick={() => setModal('routine')}>Tambah rutinitas</Button>} />}
-        </section>}
+        </AnimatedContainer>}
 
-        {widget('goals') && <section className="panel panel-goals">
+        {widget('goals') && <AnimatedContainer as="section" className="panel panel-goals" index={5}>
           <div className="panel-heading"><div><p className="eyebrow">MINGGU INI</p><h2>Target mingguan</h2></div><button type="button" className="text-link" onClick={() => onNavigate('goals')}>Lihat target <ArrowUpRight size={15} /></button></div>
           {activeGoals.length ? <div className="goal-list dashboard-goal-list">{activeGoals.slice(0, 3).map(goal => {
             const value = Math.min(100, Math.round((goal.current ?? 0) / Math.max(1, goal.target) * 100))
             return <button type="button" className="dashboard-goal" key={goal.id} onClick={() => onNavigate('goals')}><span className="goal-title-line"><strong>{goal.title}</strong><span>{goal.current ?? 0}/{goal.target}</span></span><ProgressBar value={value} label={`Progres ${goal.title}`} showValue={false} /></button>
           })}</div> : <EmptyState icon={Flag} title="Belum ada target" detail="Pilih satu hasil yang ingin Anda capai minggu ini." compact action={<Button variant="secondary" onClick={() => onNavigate('goals')}>Atur target</Button>} />}
-        </section>}
+        </AnimatedContainer>}
 
-        {widget('notes') && <section className="panel panel-notes">
+        {widget('notes') && <AnimatedContainer as="section" className="panel panel-notes" index={6}>
           <div className="panel-heading"><div><p className="eyebrow">SIMPAN UNTUK NANTI</p><h2>Catatan cepat</h2></div><button type="button" className="text-link" onClick={() => onNavigate('notes')}>Buka catatan <ArrowUpRight size={15} /></button></div>
           {quickNotes.length ? <div className="quick-note-list">{quickNotes.map(note => <button type="button" className="quick-note" key={note.id} onClick={() => onNavigate('notes')}><span className="quick-note-category">{note.category}</span><strong>{note.title || 'Tanpa judul'}</strong><span>{(note.content ?? '').slice(0, 90) || 'Belum ada isi catatan.'}</span></button>)}</div> : <EmptyState icon={NotebookPen} title="Belum ada catatan" detail="Simpan ide atau detail yang ingin Anda ingat." compact action={<Button variant="secondary" onClick={quickNote}>Buat catatan</Button>} />}
-        </section>}
+        </AnimatedContainer>}
       </div>
 
       {modal === 'task' && <TaskForm categories={data.settings.taskCategories} priorities={data.settings.priorities} task={editRecord} onSave={saveTask} onClose={() => { setModal(''); setEditRecord(null) }} />}

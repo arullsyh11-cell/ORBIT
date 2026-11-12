@@ -91,7 +91,7 @@ export default function Settings() {
     setImporting(true)
     try {
       const parsed = validateWorkspace(JSON.parse(await file.text()))
-      if (!window.confirm('Pulihkan cadangan ini? Data DayFlow yang ada saat ini akan diganti.')) return
+      if (!window.confirm('Pulihkan cadangan ini? Data ORBIT yang ada saat ini akan diganti.')) return
       data.replaceWorkspace(parsed)
       setProfile(parsed.profile)
     } catch (error) {
@@ -106,21 +106,21 @@ export default function Settings() {
     const permission = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission()
     if (permission === 'granted') {
       data.setSettings({ remindersEnabled: true })
-      data.notify('Pengingat browser diaktifkan saat DayFlow terbuka.')
+      data.notify('Pengingat browser diaktifkan saat ORBIT terbuka.')
     } else {
       data.setSettings({ remindersEnabled: false })
       data.notify('Izin notifikasi belum diberikan. Pengingat tetap tersimpan pada data.', 'error')
     }
   }
   const reset = () => {
-    if (!window.confirm('Hapus semua data DayFlow dari perangkat ini? Unduh cadangan terlebih dahulu bila ingin menyimpannya.')) return
+    if (!window.confirm('Hapus semua data ORBIT dari perangkat ini? Unduh cadangan terlebih dahulu bila ingin menyimpannya.')) return
     data.resetWorkspace()
     setProfile({ name: '', workspace: 'Ruang pribadi' })
   }
 
   return (
     <>
-      <PageHeading eyebrow="PENGATURAN / RUANG KERJA" title="Atur sesuai kebutuhanmu." description="DayFlow menyimpan data secara lokal di browser pada perangkat ini." />
+      <PageHeading eyebrow="PENGATURAN / RUANG KERJA" title="Atur sesuai kebutuhanmu." description="ORBIT menyimpan data secara lokal di browser pada perangkat ini." />
       <div className="settings-layout">
         <nav className="settings-index" aria-label="Bagian pengaturan"><a href="#profile-settings">Profil</a><a href="#theme-settings">Tampilan</a><a href="#notifications-settings">Pengingat</a><a href="#dashboard-settings">Beranda</a><a href="#categories-settings">Kategori</a><a href="#data-settings">Data</a></nav>
         <div className="settings-content">
@@ -136,7 +136,7 @@ export default function Settings() {
             <div className="category-setting-row"><div className="category-setting-copy"><strong>Prioritas tugas</strong><span>{data.settings.priorities.map(value => <span className="category-chip" key={value}>{value}{!data.tasks.some(task => task.priority === value) && <button type="button" aria-label={`Hapus prioritas ${value}`} onClick={() => removePriority(value)}>×</button>}</span>)}</span></div><form className="inline-add-form" onSubmit={addPriority}><label className="sr-only" htmlFor="new-priority">Prioritas baru</label><input id="new-priority" value={priority} onChange={event => setPriority(event.target.value)} maxLength={32} placeholder="Prioritas baru" /><Button variant="secondary" type="submit"><Plus size={15} />Tambah</Button></form></div>
           </div></section>
 
-      <section className="settings-section" id="data-settings"><div className="settings-section-heading"><p className="eyebrow">DATA PRIBADI</p><h2>Cadangkan atau pulihkan</h2><p>Ekspor membuat file JSON dari tugas, jadwal, rutinitas, catatan, dan target Anda.</p></div><div className="data-actions"><Button onClick={() => { downloadWorkspace({ version: data.version, profile: data.profile, settings: data.settings, tasks: data.tasks, schedules: data.schedules, routines: data.routines, notes: data.notes, goals: data.goals }); data.notify('File cadangan sedang diunduh.') }}><Download size={17} />Unduh cadangan</Button><Button variant="secondary" onClick={() => importRef.current?.click()} disabled={importing}><Upload size={17} />{importing ? 'Memeriksa file…' : 'Pulihkan dari JSON'}</Button><input ref={importRef} className="sr-only" type="file" accept="application/json,.json" aria-label="Pilih file cadangan DayFlow" onChange={restoreFile} /><p className="data-privacy-note"><FolderOpen size={16} />Data tetap di browser ini kecuali Anda mengekspor file.</p></div><div className="reset-row"><div><strong>Kosongkan ruang kerja</strong><span>Menghapus seluruh data DayFlow dari perangkat ini.</span></div><Button variant="danger" onClick={reset}><RotateCcw size={16} />Hapus data</Button></div></section>
+      <section className="settings-section" id="data-settings"><div className="settings-section-heading"><p className="eyebrow">DATA PRIBADI</p><h2>Cadangkan atau pulihkan</h2><p>Ekspor membuat file JSON dari tugas, jadwal, rutinitas, catatan, dan target Anda.</p></div><div className="data-actions"><Button onClick={() => { downloadWorkspace({ version: data.version, profile: data.profile, settings: data.settings, tasks: data.tasks, schedules: data.schedules, routines: data.routines, notes: data.notes, goals: data.goals }); data.notify('File cadangan sedang diunduh.') }}><Download size={17} />Unduh cadangan</Button><Button variant="secondary" onClick={() => importRef.current?.click()} disabled={importing}><Upload size={17} />{importing ? 'Memeriksa file…' : 'Pulihkan dari JSON'}</Button><input ref={importRef} className="sr-only" type="file" accept="application/json,.json" aria-label="Pilih file cadangan ORBIT" onChange={restoreFile} /><p className="data-privacy-note"><FolderOpen size={16} />Data tetap di browser ini kecuali Anda mengekspor file.</p></div><div className="reset-row"><div><strong>Kosongkan ruang kerja</strong><span>Menghapus seluruh data ORBIT dari perangkat ini.</span></div><Button variant="danger" onClick={reset}><RotateCcw size={16} />Hapus data</Button></div></section>
         </div>
       </div>
     </>

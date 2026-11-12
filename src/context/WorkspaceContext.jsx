@@ -51,7 +51,7 @@ export function WorkspaceProvider({ children }) {
   const deleteRecord = useCallback((key, id) => updateCollection(key, records => records.filter(record => record.id !== id)), [updateCollection])
   const replaceWorkspace = useCallback(data => {
     changeWorkspace(data)
-    notify('Data DayFlow berhasil dipulihkan.')
+    notify('Data ORBIT berhasil dipulihkan.')
   }, [changeWorkspace, notify])
   const resetWorkspace = useCallback(() => {
     changeWorkspace(initialData())

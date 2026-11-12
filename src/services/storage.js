@@ -26,7 +26,7 @@ function isRecord(value) {
 }
 
 export function validateWorkspace(value) {
-  if (!isRecord(value)) throw new Error('File harus berisi objek data DayFlow.')
+  if (!isRecord(value)) throw new Error('File harus berisi objek data ORBIT.')
   const arrays = ['tasks', 'schedules', 'routines', 'notes', 'goals']
   for (const key of arrays) {
     if (!Array.isArray(value[key])) throw new Error(`Data ${key} tidak ditemukan atau formatnya salah.`)
@@ -67,7 +67,7 @@ export function readWorkspace() {
   } catch (error) {
     return {
       data: initialData(),
-      error: `Data DayFlow tidak dapat dibaca: ${error.message}. Anda dapat memulihkan cadangan dari Pengaturan.`,
+      error: `Data ORBIT tidak dapat dibaca: ${error.message}. Anda dapat memulihkan cadangan dari Pengaturan.`,
     }
   }
 }
@@ -81,7 +81,7 @@ export function downloadWorkspace(data) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `dayflow-cadangan-${new Date().toISOString().slice(0, 10)}.json`
+  link.download = `orbit-cadangan-${new Date().toISOString().slice(0, 10)}.json`
   document.body.append(link)
   link.click()
   window.setTimeout(() => {
